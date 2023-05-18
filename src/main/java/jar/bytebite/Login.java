@@ -182,7 +182,7 @@ public class Login extends javax.swing.JFrame {
                     Date dataHoraAtual = new Date();
                     String data = new SimpleDateFormat("dd/MM/yyyy").format(dataHoraAtual);
                     String hora = new SimpleDateFormat("HH:mm:ss").format(dataHoraAtual);
-//                    captura.mostrar();
+                    captura.mostrar();
 //                    comp.mostrar();
                     captura.inserirNoBanco(id, senha, data, hora);
                     captura.inserirNoBancoMySQL(id, senha, data, hora);
