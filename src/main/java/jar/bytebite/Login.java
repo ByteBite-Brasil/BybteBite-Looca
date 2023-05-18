@@ -22,7 +22,11 @@ import org.springframework.dao.EmptyResultDataAccessException;
 public class Login extends javax.swing.JFrame {
 
     Conexao conexao = new Conexao();
+//    ConexaoMySQL ConexaoMySQL = new ConexaoMySQL();
+
     JdbcTemplate con = conexao.getConnection();
+//    JdbcTemplate conMySQL = ConexaoMySQL.getConnectionMySQL();
+
     Captura captura = new Captura();
     Integer fkConfig;
     Componente comp = new Componente();
@@ -168,7 +172,9 @@ public class Login extends javax.swing.JFrame {
             nextScreen();
 //            captura.mostrarInfoSistema();
             comp.inserirComponente();
-            comp.inserirConfiguracao(id);
+            if (comp.ConsultarConfig(id) < 3) {
+                comp.inserirConfiguracao(id);
+            }
             new Timer().scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
@@ -179,6 +185,7 @@ public class Login extends javax.swing.JFrame {
 //                    captura.mostrar();
 //                    comp.mostrar();
                     captura.inserirNoBanco(id, senha, data, hora);
+                    captura.inserirNoBancoMySQL(id, senha, data, hora);
                 }
             }, 0, 10000);
 
