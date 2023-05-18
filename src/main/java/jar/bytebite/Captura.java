@@ -125,12 +125,12 @@ public class Captura {
             con.update("insert into log_captura values(?, ?, ?, ?, ?);",
                     data, hora, temperaturaCpu, retornarFkConfigCpu(id, senha), 2);
 
-//            System.out.println("Inseriu no banco os dados da CPU");
+            System.out.println("Inseriu no banco os dados da CPU");
 
             con.update("insert into log_captura values(?, ?, ?, ?, ?);",
                     data, hora, ramEmUso, retornarFkConfigRam(id, senha), 1);
 
-//            System.out.println("Inseriu no banco os dados da mamória ram");
+            System.out.println("Inseriu no banco os dados da mamória ram");
 
 //            con.update("insert into log_captura values(?, ?, ?, ?);",
 //                    data, hora, janelasTotal, retornaxxx);
@@ -138,7 +138,7 @@ public class Captura {
             con.update("insert into log_captura values(?, ?, ?, ?, ?);",
                     data, hora, armazenamentoEmUso, retornarFkConfigArmazenamento(id, senha), 1);
 
-//            System.out.println("Inseriu no banco os dados do armazenamento");
+            System.out.println("Inseriu no banco os dados do armazenamento");
 //            
 
         } catch (Exception e) {
@@ -156,12 +156,12 @@ public class Captura {
             conMySQL.update("insert into log_captura ( data_, hora, medicao, fk_configuracao, fk_tipo_log) values(?, ?, ?, ?, ?);",
                     data, hora, temperaturaCpu, retornarFkConfigCpuMySQL(id, senha), 2);
 
-//            System.out.println("Inseriu no banco MySQL os dados da CPU");
+            System.out.println("Inseriu no banco MySQL os dados da CPU");
 
             conMySQL.update("insert into log_captura ( data_, hora, medicao, fk_configuracao, fk_tipo_log) values(?, ?, ?, ?, ?);",
                     data, hora, ramEmUso, retornarFkConfigRamMySQL(id, senha), 1);
 
-//            System.out.println("Inseriu no banco MySQL os dados da mamória ram");
+            System.out.println("Inseriu no banco MySQL os dados da mamória ram");
 
 //            con.update("insert into log_captura values(?, ?, ?, ?);",
 //                    data, hora, janelasTotal, retornaxxx);
@@ -169,7 +169,7 @@ public class Captura {
             conMySQL.update("insert into log_captura ( data_, hora, medicao, fk_configuracao, fk_tipo_log) values(?, ?, ?, ?, ?);",
                     data, hora, armazenamentoEmUso, retornarFkConfigArmazenamentoMySQL(id, senha), 1);
 
-//            System.out.println("Inseriu no banco MySQL os dados do armazenamento");
+            System.out.println("Inseriu no banco MySQL os dados do armazenamento");
 
         } catch (Exception e) {
             System.out.println("Erro ao inserir dados no banco MySQL.");
