@@ -17,10 +17,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class Captura {
 
     Conexao conexao = new Conexao();
-    ConexaoMySQL ConexaoMySQL = new ConexaoMySQL();
+//    ConexaoMySQL ConexaoMySQL = new ConexaoMySQL();
 
     JdbcTemplate con = conexao.getConnection();
-    JdbcTemplate conMySQL = ConexaoMySQL.getConnectionMySQL();
+//    JdbcTemplate conMySQL = ConexaoMySQL.getConnectionMySQL();
+    
+    Alerta alerta = new Alerta();
 
     Looca looca = new Looca();
     Sistema sistema = looca.getSistema();
@@ -30,16 +32,17 @@ public class Captura {
     Temperatura temperatura = looca.getTemperatura();
     double scale = Math.pow(10, 2);
 
-//    public void mostrarDados() {
     //        Processador
-    Double porcUsoCpu = cpu.getUso();
+    Double porcUso = cpu.getUso();
+    double porcUsoCpu = Math.round(porcUso * scale) / scale;
+    
     Long LongCpu = looca.getProcessador().getFrequencia();
     double c = LongCpu.doubleValue();
     Double cpuBites = c / 1000000000;
     double totalCpu = Math.round(cpuBites * scale) / scale;
-
 //        Double temperaturaCpu = temperatura.getTemperatura();
-    Double temperaturaCpu = (Math.random() * 20) + 45;
+    Double temperaturaAntes = (Math.random() * 35) + 45;
+    double temperaturaCpu = Math.round(temperaturaAntes * scale) / scale;
 
 //        Memória Ram
     Long longMemoriaD = memoria.getDisponivel();
@@ -104,16 +107,21 @@ public class Captura {
     }
 
     //MYSQL
-    public Integer retornarFkConfigCpuMySQL(String id, String senha) {
-        return conMySQL.queryForObject("select idConfiguracao from configuracao as c join maquina as m on c.fk_maquina = m.idMaquina join componente as comp on c.fk_componente = comp.idComponente where m.idMaquina = ? and m.senha = ? and comp.total = ?;", Integer.class, id, senha, totalCpu);
-    }
-
-    public Integer retornarFkConfigRamMySQL(String id, String senha) {
-        return conMySQL.queryForObject("select idConfiguracao from configuracao as c join maquina as m on c.fk_maquina = m.idMaquina join componente as comp on c.fk_componente = comp.idComponente where m.idMaquina = ? and m.senha = ? and comp.total = ?;", Integer.class, id, senha, ramTotal);
-    }
-
-    public Integer retornarFkConfigArmazenamentoMySQL(String id, String senha) {
-        return conMySQL.queryForObject("select idConfiguracao from configuracao as c join maquina as m on c.fk_maquina = m.idMaquina join componente as comp on c.fk_componente = comp.idComponente where m.idMaquina = ? and m.senha = ? and comp.total = ?;", Integer.class, id, senha, armazenamentoTotal);
+//    public Integer retornarFkConfigCpuMySQL(String id, String senha) {
+//        return conMySQL.queryForObject("select idConfiguracao from configuracao as c join maquina as m on c.fk_maquina = m.idMaquina join componente as comp on c.fk_componente = comp.idComponente where m.idMaquina = ? and m.senha = ? and comp.total = ?;", Integer.class, id, senha, totalCpu);
+//    }
+//
+//    public Integer retornarFkConfigRamMySQL(String id, String senha) {
+//        return conMySQL.queryForObject("select idConfiguracao from configuracao as c join maquina as m on c.fk_maquina = m.idMaquina join componente as comp on c.fk_componente = comp.idComponente where m.idMaquina = ? and m.senha = ? and comp.total = ?;", Integer.class, id, senha, ramTotal);
+//    }
+//
+//    public Integer retornarFkConfigArmazenamentoMySQL(String id, String senha) {
+//        return conMySQL.queryForObject("select idConfiguracao from configuracao as c join maquina as m on c.fk_maquina = m.idMaquina join componente as comp on c.fk_componente = comp.idComponente where m.idMaquina = ? and m.senha = ? and comp.total = ?;", Integer.class, id, senha, armazenamentoTotal);
+//    }
+//    
+    
+    public Integer retornarIdLog(Double medicao, String data, String hora) {
+        return con.queryForObject("select idLog from log_captura where data_ = ? and hora = ? and medicao = ?;", Integer.class, data, hora, medicao);
     }
 
     public void inserirNoBanco(String id, String senha, String data, String hora) {
@@ -121,6 +129,7 @@ public class Captura {
 
             con.update("insert into log_captura values(?, ?, ?, ?, ?);",
                     data, hora, porcUsoCpu, retornarFkConfigCpu(id, senha), 1);
+//            verificarAlertaCpu(porcUsoCpu, data, hora);
 
             con.update("insert into log_captura values(?, ?, ?, ?, ?);",
                     data, hora, temperaturaCpu, retornarFkConfigCpu(id, senha), 2);
@@ -137,45 +146,82 @@ public class Captura {
 //            System.out.println("Inseriu no banco os dados das janelas");
             con.update("insert into log_captura values(?, ?, ?, ?, ?);",
                     data, hora, armazenamentoEmUso, retornarFkConfigArmazenamento(id, senha), 1);
-
+            
             System.out.println("Inseriu no banco os dados do armazenamento");
-//            
+            System.out.println(porcUsoCpu);
+            System.out.println(temperaturaCpu);
+            System.out.println(ramEmUso);
+            System.out.println(armazenamentoEmUso);
+            verificarAlertas(data, hora);
 
         } catch (Exception e) {
             System.out.println("Erro ao inserir dados.");
             System.out.println(e);
         }
     }
-
-    public void inserirNoBancoMySQL(String id, String senha, String data, String hora) {
-        try {
-
-            conMySQL.update("insert into log_captura( data_, hora, medicao, fk_configuracao, fk_tipo_log) values(?, ?, ?, ?, ?);",
-                    data, hora, porcUsoCpu, retornarFkConfigCpuMySQL(id, senha), 1);
-
-            conMySQL.update("insert into log_captura ( data_, hora, medicao, fk_configuracao, fk_tipo_log) values(?, ?, ?, ?, ?);",
-                    data, hora, temperaturaCpu, retornarFkConfigCpuMySQL(id, senha), 2);
-
-            System.out.println("Inseriu no banco MySQL os dados da CPU");
-
-            conMySQL.update("insert into log_captura ( data_, hora, medicao, fk_configuracao, fk_tipo_log) values(?, ?, ?, ?, ?);",
-                    data, hora, ramEmUso, retornarFkConfigRamMySQL(id, senha), 1);
-
-            System.out.println("Inseriu no banco MySQL os dados da mamória ram");
-
-//            con.update("insert into log_captura values(?, ?, ?, ?);",
-//                    data, hora, janelasTotal, retornaxxx);
-//            System.out.println("Inseriu no banco os dados das janelas");
-            conMySQL.update("insert into log_captura ( data_, hora, medicao, fk_configuracao, fk_tipo_log) values(?, ?, ?, ?, ?);",
-                    data, hora, armazenamentoEmUso, retornarFkConfigArmazenamentoMySQL(id, senha), 1);
-
-            System.out.println("Inseriu no banco MySQL os dados do armazenamento");
-
-        } catch (Exception e) {
-            System.out.println("Erro ao inserir dados no banco MySQL.");
-            System.out.println(e);
-        }
+    
+    public void verificarAlertaCpu(String data, String hora){
     }
+    public void verificarAlertas(String data, String hora){
+        //Moderado
+        if((porcUsoCpu * 100 / totalCpu) >= 70 && (porcUsoCpu * 100 / totalCpu) < 90 ){
+                alerta.alertaModerado(retornarIdLog(porcUsoCpu, data, hora), 1);
+            }
+        if(temperaturaCpu >= 65 && temperaturaCpu < 71 ){
+                alerta.alertaModerado(retornarIdLog(temperaturaCpu, data, hora), 1);
+            }
+        if((ramEmUso * 100 / ramTotal) >= 80 && (ramEmUso * 100 / ramTotal) < 90 ){
+                alerta.alertaModerado(retornarIdLog(ramEmUso, data, hora), 1);
+            }
+        if((armazenamentoEmUso * 100 / armazenamentoTotal) >= 70 && (armazenamentoEmUso * 100 / armazenamentoTotal) < 90 ){
+                alerta.alertaModerado(retornarIdLog(armazenamentoEmUso, data, hora), 1);
+            }
+        //Crítico
+        
+        if((porcUsoCpu * 100 / totalCpu) >= 90 ){
+                alerta.alertaCritico(retornarIdLog(porcUsoCpu, data, hora), 1);
+            }
+        if(temperaturaCpu >= 71 ){
+                alerta.alertaCritico(retornarIdLog(temperaturaCpu, data, hora), 1);
+            }
+        if((ramEmUso * 100 / ramTotal) >= 90 ){
+                alerta.alertaCritico(retornarIdLog(ramEmUso, data, hora), 1);
+            }
+        if((armazenamentoEmUso * 100 / armazenamentoTotal) >= 99 ){
+                alerta.alertaCritico(retornarIdLog(armazenamentoEmUso, data, hora), 1);
+            }
+        
+    }
+
+//    public void inserirNoBancoMySQL(String id, String senha, String data, String hora) {
+//        try {
+//
+//            conMySQL.update("insert into log_captura( data_, hora, medicao, fk_configuracao, fk_tipo_log) values(?, ?, ?, ?, ?);",
+//                    data, hora, porcUsoCpu, retornarFkConfigCpuMySQL(id, senha), 1);
+//
+//            conMySQL.update("insert into log_captura ( data_, hora, medicao, fk_configuracao, fk_tipo_log) values(?, ?, ?, ?, ?);",
+//                    data, hora, temperaturaCpu, retornarFkConfigCpuMySQL(id, senha), 2);
+//
+//            System.out.println("Inseriu no banco MySQL os dados da CPU");
+//
+//            conMySQL.update("insert into log_captura ( data_, hora, medicao, fk_configuracao, fk_tipo_log) values(?, ?, ?, ?, ?);",
+//                    data, hora, ramEmUso, retornarFkConfigRamMySQL(id, senha), 1);
+//
+//            System.out.println("Inseriu no banco MySQL os dados da mamória ram");
+//
+////            con.update("insert into log_captura values(?, ?, ?, ?);",
+////                    data, hora, janelasTotal, retornaxxx);
+////            System.out.println("Inseriu no banco os dados das janelas");
+//            conMySQL.update("insert into log_captura ( data_, hora, medicao, fk_configuracao, fk_tipo_log) values(?, ?, ?, ?, ?);",
+//                    data, hora, armazenamentoEmUso, retornarFkConfigArmazenamentoMySQL(id, senha), 1);
+//
+//            System.out.println("Inseriu no banco MySQL os dados do armazenamento");
+//
+//        } catch (Exception e) {
+//            System.out.println("Erro ao inserir dados no banco MySQL.");
+//            System.out.println(e);
+//        }
+//    }
 
  
 

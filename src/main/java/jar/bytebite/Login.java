@@ -170,22 +170,19 @@ public class Login extends javax.swing.JFrame {
         String senha = jTextField2.getText();
         if (selectLogin(id, senha)) {
             nextScreen();
-//            captura.mostrarInfoSistema();
+            captura.mostrarInfoSistema();
             comp.inserirComponente();
-            if (comp.ConsultarConfig(id) < 3) {
+            if (comp.consultarConfig(id) < 3) {
                 comp.inserirConfiguracao(id);
             }
             new Timer().scheduleAtFixedRate(new TimerTask() {
                 @Override
-                public void run() {
-                    //Data 
+                public void run() { 
                     Date dataHoraAtual = new Date();
                     String data = new SimpleDateFormat("dd/MM/yyyy").format(dataHoraAtual);
                     String hora = new SimpleDateFormat("HH:mm:ss").format(dataHoraAtual);
-//                    captura.mostrar();
-//                    comp.mostrar();
                     captura.inserirNoBanco(id, senha, data, hora);
-                    captura.inserirNoBancoMySQL(id, senha, data, hora);
+//                    captura.inserirNoBancoMySQL(id, senha, data, hora);
                 }
             }, 0, 10000);
 
