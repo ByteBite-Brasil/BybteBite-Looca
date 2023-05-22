@@ -129,7 +129,6 @@ public class Captura {
 
             con.update("insert into log_captura values(?, ?, ?, ?, ?);",
                     data, hora, porcUsoCpu, retornarFkConfigCpu(id, senha), 1);
-//            verificarAlertaCpu(porcUsoCpu, data, hora);
 
             con.update("insert into log_captura values(?, ?, ?, ?, ?);",
                     data, hora, temperaturaCpu, retornarFkConfigCpu(id, senha), 2);
@@ -160,8 +159,6 @@ public class Captura {
         }
     }
     
-    public void verificarAlertaCpu(String data, String hora){
-    }
     public void verificarAlertas(String data, String hora){
         //Moderado
         if((porcUsoCpu * 100 / totalCpu) >= 70 && (porcUsoCpu * 100 / totalCpu) < 90 ){
