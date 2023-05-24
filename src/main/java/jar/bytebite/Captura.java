@@ -21,7 +21,7 @@ public class Captura {
 
     JdbcTemplate con = conexao.getConnection();
 //    JdbcTemplate conMySQL = ConexaoMySQL.getConnectionMySQL();
-    
+
     Alerta alerta = new Alerta();
 
     Looca looca = new Looca();
@@ -35,7 +35,7 @@ public class Captura {
     //        Processador
     Double porcUso = cpu.getUso();
     double porcUsoCpu = Math.round(porcUso * scale) / scale;
-    
+
     Long LongCpu = looca.getProcessador().getFrequencia();
     double c = LongCpu.doubleValue();
     Double cpuBites = c / 1000000000;
@@ -119,7 +119,6 @@ public class Captura {
 //        return conMySQL.queryForObject("select idConfiguracao from configuracao as c join maquina as m on c.fk_maquina = m.idMaquina join componente as comp on c.fk_componente = comp.idComponente where m.idMaquina = ? and m.senha = ? and comp.total = ?;", Integer.class, id, senha, armazenamentoTotal);
 //    }
 //    
-    
     public Integer retornarIdLog(Double medicao, String data, String hora) {
         return con.queryForObject("select idLog from log_captura where data_ = ? and hora = ? and medicao = ?;", Integer.class, data, hora, medicao);
     }
@@ -140,12 +139,14 @@ public class Captura {
 
             System.out.println("Inseriu no banco os dados da mamória ram");
 
-//            con.update("insert into log_captura values(?, ?, ?, ?);",
-//                    data, hora, janelasTotal, retornaxxx);
-//            System.out.println("Inseriu no banco os dados das janelas");
+            con.update("insert into janelas values(?, ?, ?);",
+                    data, hora, janelasTotal);
+
+            System.out.println("Inseriu no banco os dados das janelas");
+
             con.update("insert into log_captura values(?, ?, ?, ?, ?);",
                     data, hora, armazenamentoEmUso, retornarFkConfigArmazenamento(id, senha), 1);
-            
+
             System.out.println("Inseriu no banco os dados do armazenamento");
             System.out.println(porcUsoCpu);
             System.out.println(temperaturaCpu);
@@ -158,36 +159,45 @@ public class Captura {
             System.out.println(e);
         }
     }
-    
-    public void verificarAlertas(String data, String hora){
+
+    public void verificarAlertas(String data, String hora) {
+//        1 Uso da CPU está alto.
+//        2 uso da CPU está em estado crítico.
+//        3 A temperatura da CPU está alta.
+//        4 A temperatura da CPU está em estado crítico.
+//        5 O uso da memória ram está alto.
+//        6 O uso da memória ram está em estado crítico.
+//        7 O uso do armazenamento está alto.
+//        8 O uso do armazenamento está em estado crítico.
+
         //Moderado
-        if((porcUsoCpu * 100 / totalCpu) >= 70 && (porcUsoCpu * 100 / totalCpu) < 90 ){
-                alerta.alertaModerado(retornarIdLog(porcUsoCpu, data, hora), 1);
-            }
-        if(temperaturaCpu >= 65 && temperaturaCpu < 71 ){
-                alerta.alertaModerado(retornarIdLog(temperaturaCpu, data, hora), 1);
-            }
-        if((ramEmUso * 100 / ramTotal) >= 80 && (ramEmUso * 100 / ramTotal) < 90 ){
-                alerta.alertaModerado(retornarIdLog(ramEmUso, data, hora), 1);
-            }
-        if((armazenamentoEmUso * 100 / armazenamentoTotal) >= 70 && (armazenamentoEmUso * 100 / armazenamentoTotal) < 90 ){
-                alerta.alertaModerado(retornarIdLog(armazenamentoEmUso, data, hora), 1);
-            }
+        if ((porcUsoCpu * 100 / totalCpu) >= 70 && (porcUsoCpu * 100 / totalCpu) < 90) {
+            alerta.alertaModerado(retornarIdLog(porcUsoCpu, data, hora), 1, data, hora);
+        }
+        if (temperaturaCpu >= 65 && temperaturaCpu < 71) {
+            alerta.alertaModerado(retornarIdLog(temperaturaCpu, data, hora), 3, data, hora);
+        }
+        if ((ramEmUso * 100 / ramTotal) >= 80 && (ramEmUso * 100 / ramTotal) < 90) {
+            alerta.alertaModerado(retornarIdLog(ramEmUso, data, hora), 5, data, hora);
+        }
+        if ((armazenamentoEmUso * 100 / armazenamentoTotal) >= 70 && (armazenamentoEmUso * 100 / armazenamentoTotal) < 90) {
+            alerta.alertaModerado(retornarIdLog(armazenamentoEmUso, data, hora), 7, data, hora);
+        }
         //Crítico
-        
-        if((porcUsoCpu * 100 / totalCpu) >= 90 ){
-                alerta.alertaCritico(retornarIdLog(porcUsoCpu, data, hora), 1);
-            }
-        if(temperaturaCpu >= 71 ){
-                alerta.alertaCritico(retornarIdLog(temperaturaCpu, data, hora), 1);
-            }
-        if((ramEmUso * 100 / ramTotal) >= 90 ){
-                alerta.alertaCritico(retornarIdLog(ramEmUso, data, hora), 1);
-            }
-        if((armazenamentoEmUso * 100 / armazenamentoTotal) >= 99 ){
-                alerta.alertaCritico(retornarIdLog(armazenamentoEmUso, data, hora), 1);
-            }
-        
+
+        if ((porcUsoCpu * 100 / totalCpu) >= 90) {
+            alerta.alertaCritico(retornarIdLog(porcUsoCpu, data, hora), 2, data, hora);
+        }
+        if (temperaturaCpu >= 71) {
+            alerta.alertaCritico(retornarIdLog(temperaturaCpu, data, hora), 4, data, hora);
+        }
+        if ((ramEmUso * 100 / ramTotal) >= 90) {
+            alerta.alertaCritico(retornarIdLog(ramEmUso, data, hora), 6, data, hora);
+        }
+        if ((armazenamentoEmUso * 100 / armazenamentoTotal) >= 99) {
+            alerta.alertaCritico(retornarIdLog(armazenamentoEmUso, data, hora), 8, data, hora);
+        }
+
     }
 
 //    public void inserirNoBancoMySQL(String id, String senha, String data, String hora) {
@@ -219,9 +229,6 @@ public class Captura {
 //            System.out.println(e);
 //        }
 //    }
-
- 
-
     public void mostrarInfoSistema() {
 
         System.out.println(sistema.toString());

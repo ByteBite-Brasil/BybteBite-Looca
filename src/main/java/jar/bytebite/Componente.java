@@ -91,15 +91,15 @@ public class Componente {
 //        }
     }
 
-    public Integer FkComponenteParaConfigCpu() {
+    public Integer fkComponenteParaConfigCpu() {
         return con.queryForObject("select idComponente from componente where total = ?;", Integer.class, totalCpu);
     }
 
-    public Integer FkComponenteParaConfigRam() {
+    public Integer fkComponenteParaConfigRam() {
         return con.queryForObject("select idComponente from componente where total = ?;", Integer.class, ramTotal);
     }
 
-    public Integer FkComponenteParaConfigArmazenamento() {
+    public Integer fkComponenteParaConfigArmazenamento() {
         return con.queryForObject("select idComponente from componente where total = ?;", Integer.class, armazenamentoTotal);
     }
     
@@ -125,11 +125,11 @@ public class Componente {
             
             
             con.update("insert into configuracao values (?, ?);",
-                    id, FkComponenteParaConfigCpu());
+                    id, fkComponenteParaConfigCpu());
             con.update("insert into configuracao values (?, ?);",
-                    id, FkComponenteParaConfigRam());
+                    id, fkComponenteParaConfigRam());
             con.update("insert into configuracao values (?, ?);",
-                    id, FkComponenteParaConfigArmazenamento());
+                    id, fkComponenteParaConfigArmazenamento());
             System.out.println("Deu Certo a inserção de configuração");
             
            
