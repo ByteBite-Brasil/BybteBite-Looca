@@ -14,17 +14,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public class Componente {
 
     Conexao conexao = new Conexao();
-<<<<<<< HEAD
-//    ConexaoMySQL ConexaoMySQL = new ConexaoMySQL();
-    
     JdbcTemplate con = conexao.getConnection();
-//    JdbcTemplate conMySQL = ConexaoMySQL.getConnectionMySQL();
-=======
+    
     ConexaoMySQL ConexaoMySQL = new ConexaoMySQL();
-    
-    JdbcTemplate con = conexao.getConnection();
     JdbcTemplate conMySQL = ConexaoMySQL.getConnectionMySQL();
->>>>>>> bc38bb56a284e6613717a6141dc780be0216b43c
     
     Looca looca = new Looca();
     double scale = Math.pow(10, 2);
@@ -69,7 +62,6 @@ public class Componente {
             System.out.println("Componente do tipo 'Armazenamento' já existente.");
         }
         //MYSQL
-<<<<<<< HEAD
 //        try {
 //            conMySQL.update("insert into componente (total, unidadeMedida, fk_tipo_componente) values(?, ?, ?);",
 //                    totalCpu, "GHz", 1);
@@ -97,8 +89,7 @@ public class Componente {
 //            System.out.println("Componente do tipo 'Armazenamento' já existente.");
 //            
 //        }
-=======
-        try {
+try {
             conMySQL.update("insert into componente (total, unidadeMedida, fk_tipo_componente) values(?, ?, ?);",
                     totalCpu, "GHz", 1);
             System.out.println("Inseriu um novo componente do tipo 'Cpu'.");
@@ -125,22 +116,21 @@ public class Componente {
             System.out.println("Componente do tipo 'Armazenamento' já existente.");
             
         }
->>>>>>> bc38bb56a284e6613717a6141dc780be0216b43c
+        
     }
 
-    public Integer FkComponenteParaConfigCpu() {
+    public Integer fkComponenteParaConfigCpu() {
         return con.queryForObject("select idComponente from componente where total = ?;", Integer.class, totalCpu);
     }
 
-    public Integer FkComponenteParaConfigRam() {
+    public Integer fkComponenteParaConfigRam() {
         return con.queryForObject("select idComponente from componente where total = ?;", Integer.class, ramTotal);
     }
 
-    public Integer FkComponenteParaConfigArmazenamento() {
+    public Integer fkComponenteParaConfigArmazenamento() {
         return con.queryForObject("select idComponente from componente where total = ?;", Integer.class, armazenamentoTotal);
     }
     
-<<<<<<< HEAD
 //    public Integer FkComponenteParaConfigCpuMySQL() {
 //        return conMySQL.queryForObject("select idComponente from componente where total = ?;", Integer.class, totalCpu);
 //    }
@@ -153,9 +143,11 @@ public class Componente {
 //        return conMySQL.queryForObject("select idComponente from componente where total = ?;", Integer.class, armazenamentoTotal);
 //    }
 //
-    public Integer ConsultarConfig(String id) {
+
+    public Integer consultarConfig(String id) {
         return con.queryForObject("SELECT COUNT(idConfiguracao) FROM configuracao WHERE fk_maquina = ?", Integer.class, id);
-=======
+    } 
+        
     public Integer FkComponenteParaConfigCpuMySQL() {
         return conMySQL.queryForObject("select idComponente from componente where total = ?;", Integer.class, totalCpu);
     }
@@ -167,11 +159,6 @@ public class Componente {
     public Integer FkComponenteParaConfigArmazenamentoMySQL() {
         return conMySQL.queryForObject("select idComponente from componente where total = ?;", Integer.class, armazenamentoTotal);
     }
-
-    public Integer ConsultarConfig(String id) {
-        return conMySQL.queryForObject("SELECT COUNT(idConfiguracao) FROM configuracao WHERE fk_maquina = ?", Integer.class, id);
->>>>>>> bc38bb56a284e6613717a6141dc780be0216b43c
-    }
     
     public void inserirConfiguracao(String id) {
         
@@ -179,16 +166,13 @@ public class Componente {
             
             
             con.update("insert into configuracao values (?, ?);",
-                    id, FkComponenteParaConfigCpu());
+                    id, fkComponenteParaConfigCpu());
             con.update("insert into configuracao values (?, ?);",
-                    id, FkComponenteParaConfigRam());
+                    id, fkComponenteParaConfigRam());
             con.update("insert into configuracao values (?, ?);",
-                    id, FkComponenteParaConfigArmazenamento());
+                    id, fkComponenteParaConfigArmazenamento());
             System.out.println("Deu Certo a inserção de configuração");
             
-           
-
-<<<<<<< HEAD
 //            conMySQL.update("insert into configuracao (fk_maquina, fk_componente) values (?, ?);",
 //                    id, FkComponenteParaConfigCpuMySQL());
 //            conMySQL.update("insert into configuracao (fk_maquina, fk_componente) values (?, ?);",
@@ -196,7 +180,6 @@ public class Componente {
 //            conMySQL.update("insert into configuracao (fk_maquina, fk_componente) values (?, ?);",
 //                    id, FkComponenteParaConfigArmazenamentoMySQL());
 //            System.out.println("Deu Certo a inserção de configuração");
-=======
             conMySQL.update("insert into configuracao (fk_maquina, fk_componente) values (?, ?);",
                     id, FkComponenteParaConfigCpuMySQL());
             conMySQL.update("insert into configuracao (fk_maquina, fk_componente) values (?, ?);",
@@ -204,7 +187,6 @@ public class Componente {
             conMySQL.update("insert into configuracao (fk_maquina, fk_componente) values (?, ?);",
                     id, FkComponenteParaConfigArmazenamentoMySQL());
             System.out.println("Deu Certo a inserção de configuração");
->>>>>>> bc38bb56a284e6613717a6141dc780be0216b43c
 
         } catch (Exception e) {
             System.out.println("Erro na inserção de configuração");
