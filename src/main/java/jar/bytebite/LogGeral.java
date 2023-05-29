@@ -52,7 +52,7 @@ public class LogGeral {
                 + "\nRAM DISPONÍVEL                            >>" + ramDisponivel + " GB"
                 + "\nCPU TOTAL                                 >>" + totalCpu + " GHz"
                 + "\nCPU EM USO                                >>" + porcUsoCpu + " GHz"
-//                + "\nTEMPERATURA DA CPU                        >>" + temperatura + " C°" >> captura retorna 0.0
+                //                + "\nTEMPERATURA DA CPU                        >>" + temperatura + " C°" >> captura retorna 0.0
                 + "\nARMAZENAMENTO TOTAL                       >>" + armazenamentoTotal + "GB"
                 + "\nARMAZENAMENTO EM USO                      >>" + armazenamentoUso + " GB"
                 + "\nJANELAS ABERTAS                           >> " + janelas + " U";

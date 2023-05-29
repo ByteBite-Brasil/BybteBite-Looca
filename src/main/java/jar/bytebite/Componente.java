@@ -11,14 +11,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
  *
  * @author ViniciusJesus
  */
-public class Componente {
+public class Componente extends Conexao {
 
     Conexao conexao = new Conexao();
     JdbcTemplate con = conexao.getConnection();
-    
-    ConexaoMySQL ConexaoMySQL = new ConexaoMySQL();
-    JdbcTemplate conMySQL = ConexaoMySQL.getConnectionMySQL();
-    
+
     Looca looca = new Looca();
     double scale = Math.pow(10, 2);
 
@@ -61,62 +58,7 @@ public class Componente {
         } catch (Exception e) {
             System.out.println("Componente do tipo 'Armazenamento' já existente.");
         }
-        //MYSQL
-//        try {
-//            conMySQL.update("insert into componente (total, unidadeMedida, fk_tipo_componente) values(?, ?, ?);",
-//                    totalCpu, "GHz", 1);
-//            System.out.println("Inseriu um novo componente do tipo 'Cpu'.");
-//
-//        } catch (Exception e) {
-//            System.out.println("Componente do tipo 'Cpu' já existente.");
-//            
-//        }
-//        try {
-//            conMySQL.update("insert into componente (total, unidadeMedida, fk_tipo_componente) values(?, ?, ?);",
-//                    ramTotal, "GB", 2);
-//            System.out.println("Inseriu um novo componente do tipo 'Memória ram'.");
-//
-//        } catch (Exception e) {
-//            System.out.println("Componente do tipo 'Memória ram' já existente.");
-//            
-//        }
-//        try {
-//            conMySQL.update("insert into componente(total, unidadeMedida, fk_tipo_componente) values(?, ?, ?);",
-//                    armazenamentoTotal, "GB", 3);
-//            System.out.println("Inseriu um novo componente do tipo 'Armazenamento'.");
-//
-//        } catch (Exception e) {
-//            System.out.println("Componente do tipo 'Armazenamento' já existente.");
-//            
-//        }
-try {
-            conMySQL.update("insert into componente (total, unidadeMedida, fk_tipo_componente) values(?, ?, ?);",
-                    totalCpu, "GHz", 1);
-            System.out.println("Inseriu um novo componente do tipo 'Cpu'.");
 
-        } catch (Exception e) {
-            System.out.println("Componente do tipo 'Cpu' já existente.");
-            
-        }
-        try {
-            conMySQL.update("insert into componente (total, unidadeMedida, fk_tipo_componente) values(?, ?, ?);",
-                    ramTotal, "GB", 2);
-            System.out.println("Inseriu um novo componente do tipo 'Memória ram'.");
-
-        } catch (Exception e) {
-            System.out.println("Componente do tipo 'Memória ram' já existente.");
-            
-        }
-        try {
-            conMySQL.update("insert into componente(total, unidadeMedida, fk_tipo_componente) values(?, ?, ?);",
-                    armazenamentoTotal, "GB", 3);
-            System.out.println("Inseriu um novo componente do tipo 'Armazenamento'.");
-
-        } catch (Exception e) {
-            System.out.println("Componente do tipo 'Armazenamento' já existente.");
-            
-        }
-        
     }
 
     public Integer fkComponenteParaConfigCpu() {
@@ -130,41 +72,15 @@ try {
     public Integer fkComponenteParaConfigArmazenamento() {
         return con.queryForObject("select idComponente from componente where total = ?;", Integer.class, armazenamentoTotal);
     }
-    
-//    public Integer FkComponenteParaConfigCpuMySQL() {
-//        return conMySQL.queryForObject("select idComponente from componente where total = ?;", Integer.class, totalCpu);
-//    }
-//
-//    public Integer FkComponenteParaConfigRamMySQL() {
-//        return conMySQL.queryForObject("select idComponente from componente where total = ?;", Integer.class, ramTotal);
-//    }
-//
-//    public Integer FkComponenteParaConfigArmazenamentoMySQL() {
-//        return conMySQL.queryForObject("select idComponente from componente where total = ?;", Integer.class, armazenamentoTotal);
-//    }
-//
 
     public Integer consultarConfig(String id) {
         return con.queryForObject("SELECT COUNT(idConfiguracao) FROM configuracao WHERE fk_maquina = ?", Integer.class, id);
-    } 
-        
-    public Integer FkComponenteParaConfigCpuMySQL() {
-        return conMySQL.queryForObject("select idComponente from componente where total = ?;", Integer.class, totalCpu);
     }
 
-    public Integer FkComponenteParaConfigRamMySQL() {
-        return conMySQL.queryForObject("select idComponente from componente where total = ?;", Integer.class, ramTotal);
-    }
-
-    public Integer FkComponenteParaConfigArmazenamentoMySQL() {
-        return conMySQL.queryForObject("select idComponente from componente where total = ?;", Integer.class, armazenamentoTotal);
-    }
-    
     public void inserirConfiguracao(String id) {
-        
+
         try {
-            
-            
+
             con.update("insert into configuracao values (?, ?);",
                     id, fkComponenteParaConfigCpu());
             con.update("insert into configuracao values (?, ?);",
@@ -172,25 +88,10 @@ try {
             con.update("insert into configuracao values (?, ?);",
                     id, fkComponenteParaConfigArmazenamento());
             System.out.println("Deu Certo a inserção de configuração");
-            
-//            conMySQL.update("insert into configuracao (fk_maquina, fk_componente) values (?, ?);",
-//                    id, FkComponenteParaConfigCpuMySQL());
-//            conMySQL.update("insert into configuracao (fk_maquina, fk_componente) values (?, ?);",
-//                    id, FkComponenteParaConfigRamMySQL());
-//            conMySQL.update("insert into configuracao (fk_maquina, fk_componente) values (?, ?);",
-//                    id, FkComponenteParaConfigArmazenamentoMySQL());
-//            System.out.println("Deu Certo a inserção de configuração");
-            conMySQL.update("insert into configuracao (fk_maquina, fk_componente) values (?, ?);",
-                    id, FkComponenteParaConfigCpuMySQL());
-            conMySQL.update("insert into configuracao (fk_maquina, fk_componente) values (?, ?);",
-                    id, FkComponenteParaConfigRamMySQL());
-            conMySQL.update("insert into configuracao (fk_maquina, fk_componente) values (?, ?);",
-                    id, FkComponenteParaConfigArmazenamentoMySQL());
-            System.out.println("Deu Certo a inserção de configuração");
 
         } catch (Exception e) {
             System.out.println("Erro na inserção de configuração");
-            
+
         }
     }
 

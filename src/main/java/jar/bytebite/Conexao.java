@@ -18,26 +18,23 @@ import org.springframework.jdbc.core.JdbcTemplate;
  */
 public class Conexao {
 
-
     private JdbcTemplate connection;
 
     public Conexao() {
 
-            BasicDataSource dataSource = new BasicDataSource();
+        BasicDataSource dataSource = new BasicDataSource();
 
-            dataSource​.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        dataSource​.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 
-            dataSource​.setUrl("jdbc:sqlserver://server-bytebite.database.windows.net:1433;database=bd-bytebite;encryp\n"
-                    + "t=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;");
+        dataSource​.setUrl("jdbc:sqlserver://server-bytebite.database.windows.net:1433;database=bd-bytebite;encryp\n"
+                + "t=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;");
 
-            dataSource​.setUsername("admin-bytebite");
+        dataSource​.setUsername("admin-bytebite");
 
-            dataSource​.setPassword("#Gfgrupo9");
+        dataSource​.setPassword("#Gfgrupo9");
 
-            this.connection = new JdbcTemplate(dataSource);
-        
-        
-        
+        this.connection = new JdbcTemplate(dataSource);
+
     }
 
     public JdbcTemplate getConnection() {

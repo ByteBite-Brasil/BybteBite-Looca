@@ -18,18 +18,15 @@ import org.springframework.jdbc.core.JdbcTemplate;
  */
 public class ConexaoMySQL {
 
-
     private JdbcTemplate connectionMySQL;
 
     public ConexaoMySQL() {
 
-        
         BasicDataSource dataSourceMysql = new BasicDataSource();
 
         dataSourceMysql.setDriverClassName("com.mysql.cj.jdbc.Driver");
 
-        dataSourceMysql.setUrl("jdbc:mysql://localhost:3306/ByteBite");    
-
+        dataSourceMysql.setUrl("jdbc:mysql://localhost:3306/ByteBite");
 
         dataSourceMysql.setUsername("root");
 

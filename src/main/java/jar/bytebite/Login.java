@@ -170,7 +170,7 @@ public class Login extends javax.swing.JFrame {
             }
             new Timer().scheduleAtFixedRate(new TimerTask() {
                 @Override
-                public void run() { 
+                public void run() {
                     Date dataHoraAtual = new Date();
                     String data = new SimpleDateFormat("dd/MM/yyyy").format(dataHoraAtual);
                     String hora = new SimpleDateFormat("HH:mm:ss").format(dataHoraAtual);

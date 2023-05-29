@@ -12,7 +12,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  *
  * @author ViniciusJesus
  */
-public class Captura {
+public class Captura extends Conexao {
 
     Conexao conexao = new Conexao();
     ConexaoMySQL ConexaoMySQL = new ConexaoMySQL();
@@ -38,7 +38,7 @@ public class Captura {
     double c = LongCpu.doubleValue();
     Double cpuBites = c / 1000000000;
     double totalCpu = Math.round(cpuBites * scale) / scale;
-//        Double temperaturaCpu = temperatura.getTemperatura();
+
     Double temperaturaAntes = (Math.random() * 35) + 45;
     double temperaturaCpu = Math.round(temperaturaAntes * scale) / scale;
 
@@ -66,31 +66,9 @@ public class Captura {
     Double armazenamentoBites = a / (1024 * 1024 * 1024);
     double armazenamentoTotal = Math.round(armazenamentoBites * scale) / scale;
 
-//        Long longArmazenamentoEmUso = discoGrupo.getDiscos().get(0).getBytesDeLeitura();
-//        double aEmUso = longArmazenamentoEmUso.doubleValue();
-//        Double armazenamentoEmUsoBites = aEmUso / (1024*1024*1024);
-//        double armazenamentoEmUso = Math.round(armazenamentoEmUsoBites*scale)/scale;
     Double armazenamentoEmUsoSemFormatar = Double.valueOf(discoGrupo.getDiscos().get(0).getBytesDeLeitura());
     Double armazenamentoEmUsoSemFormatado = armazenamentoEmUsoSemFormatar / 1000000000.00;
     Double armazenamentoEmUso = Math.round(armazenamentoEmUsoSemFormatado * scale) / scale;
-//
-//    public void mostrar() {
-//
-//        System.out.println("Processador Uso:");
-//        System.out.println(porcUsoCpu);
-//        System.out.println("Temperatura processador:");
-//        System.out.println(temperaturaCpu);
-//        System.out.println("Memória RAM total/disponivel/uso:");
-//        System.out.println(ramTotal);
-//        System.out.println(ramDisponivel);
-//        System.out.println(ramEmUso);
-//        System.out.println("Total janelas:");
-//        System.out.println(janelasTotal);
-//        System.out.println("Armazenamento total/emUso");
-//        System.out.println(armazenamentoTotal);
-//        System.out.println(armazenamentoEmUso);
-////    }
-//    }
 
     public Integer retornarFkConfigCpu(String id, String senha) {
         return con.queryForObject("select idConfiguracao from configuracao as c join maquina as m on c.fk_maquina = m.idMaquina join componente as comp on c.fk_componente = comp.idComponente where m.idMaquina = ? and m.senha = ? and comp.total = ?; ", Integer.class, id, senha, totalCpu);
@@ -104,34 +82,8 @@ public class Captura {
         return con.queryForObject("select idConfiguracao from configuracao as c join maquina as m on c.fk_maquina = m.idMaquina join componente as comp on c.fk_componente = comp.idComponente where m.idMaquina = ? and m.senha = ? and comp.total = ?; ", Integer.class, id, senha, armazenamentoTotal);
     }
 
-    //MYSQL
-//    public Integer retornarFkConfigCpuMySQL(String id, String senha) {
-//        return conMySQL.queryForObject("select idConfiguracao from configuracao as c join maquina as m on c.fk_maquina = m.idMaquina join componente as comp on c.fk_componente = comp.idComponente where m.idMaquina = ? and m.senha = ? and comp.total = ?;", Integer.class, id, senha, totalCpu);
-//    }
-//
-//    public Integer retornarFkConfigRamMySQL(String id, String senha) {
-//        return conMySQL.queryForObject("select idConfiguracao from configuracao as c join maquina as m on c.fk_maquina = m.idMaquina join componente as comp on c.fk_componente = comp.idComponente where m.idMaquina = ? and m.senha = ? and comp.total = ?;", Integer.class, id, senha, ramTotal);
-//    }
-//
-//    public Integer retornarFkConfigArmazenamentoMySQL(String id, String senha) {
-//        return conMySQL.queryForObject("select idConfiguracao from configuracao as c join maquina as m on c.fk_maquina = m.idMaquina join componente as comp on c.fk_componente = comp.idComponente where m.idMaquina = ? and m.senha = ? and comp.total = ?;", Integer.class, id, senha, armazenamentoTotal);
-//    }
-//    
     public Integer retornarIdLog(Double medicao, String data, String hora) {
         return con.queryForObject("select idLog from log_captura where data_ = ? and hora = ? and medicao = ?;", Integer.class, data, hora, medicao);
-    }
-    
-    public Integer retornarFkConfigCpuMySQL(String id, String senha) {
-        return conMySQL.queryForObject("select idConfiguracao from configuracao as c join maquina as m on c.fk_maquina = m.idMaquina join componente as comp on c.fk_componente = comp.idComponente where m.idMaquina = ? and m.senha = ? and comp.total = ?;", Integer.class, id, senha, totalCpu);
-    }
-
-    public Integer retornarFkConfigRamMySQL(String id, String senha) {
-        return conMySQL.queryForObject("select idConfiguracao from configuracao as c join maquina as m on c.fk_maquina = m.idMaquina join componente as comp on c.fk_componente = comp.idComponente where m.idMaquina = ? and m.senha = ? and comp.total = ?;", Integer.class, id, senha, ramTotal);
-    }
-
-    public Integer retornarFkConfigArmazenamentoMySQL(String id, String senha) {
-        return conMySQL.queryForObject("select idConfiguracao from configuracao as c join maquina as m on c.fk_maquina = m.idMaquina join componente as comp on c.fk_componente = comp.idComponente where m.idMaquina = ? and m.senha = ? and comp.total = ?;", Integer.class, id, senha, armazenamentoTotal);
-
     }
 
     public void inserirNoBanco(String id, String senha, String data, String hora) {
@@ -237,6 +189,7 @@ public class Captura {
             System.out.println(e);
         }
     }
+
     public void mostrarInfoSistema() {
 
         System.out.println(sistema.toString());
