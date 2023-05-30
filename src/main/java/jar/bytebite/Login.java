@@ -1,12 +1,22 @@
 package jar.bytebite;
 
+import com.github.britooo.looca.api.core.Looca;
 import java.awt.Color;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.FileHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -27,20 +37,88 @@ public class Login extends javax.swing.JFrame {
 //    JdbcTemplate conMySQL = ConexaoMySQL.getConnectionMySQL();
     Captura captura = new Captura();
     Componente comp = new Componente();
+    LogGeral logGeral = new LogGeral();
 
-    /**
+
+    
+    private static Logger logger = Logger.getLogger(Login.class.getName());
+
+    public static void logFormatacao() throws IOException {
+        Looca looca = new Looca();
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        String dataFormatada = dateFormat.format(date);
+        String sistemaOperacional = looca.getSistema().getSistemaOperacional();
+
+        if (sistemaOperacional.equalsIgnoreCase("Windows")) {
+            Path path = Paths.get("C:/Logs-ByteBite/Login/");
+            if (!Files.exists(path)) {
+                Files.createDirectories(path);
+            }
+            FileHandler fileHadler = new FileHandler(String.format("C:/Logs-ByteBite/Login/%s.txt", dataFormatada));
+            fileHadler.setFormatter(new Formatter() {
+                private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy >> HH:mm:ss");
+
+                public String format(LogRecord record) {
+
+                    StringBuilder builder = new StringBuilder();
+                    builder.append(dateFormat.format(new Date())).append(" ");
+                    builder.append(record.getLevel()).append(": ");
+                    builder.append(record.getMessage()).append(" (");
+                    builder.append(record.getSourceClassName()).append(".");
+                    builder.append(record.getSourceMethodName()).append(")");
+                    builder.append(System.lineSeparator());
+                    return builder.toString();
+                }
+            }
+            );
+            logger.addHandler(fileHadler);
+            logger.setLevel(Level.ALL);
+        }
+
+        if (sistemaOperacional.equalsIgnoreCase("Ubuntu")) {
+            Path path = Paths.get("/home/ubuntu/Desktop/Logs-ByteBite/Login/");
+            if (!Files.exists(path)) {
+                Files.createDirectories(path);
+            }
+            FileHandler fileHadler = new FileHandler(String.format("/home/ubuntu/Desktop/Logs-ByteBite/Login/%s.txt", dataFormatada));
+            fileHadler.setFormatter(new Formatter() {
+                private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy >> HH:nn:ss");
+
+                public String format(LogRecord record) {
+
+                    StringBuilder builder = new StringBuilder();
+                    builder.append(dateFormat.format(new Date())).append(" ");
+                    builder.append(record.getLevel()).append(": ");
+                    builder.append(record.getMessage()).append(" (");
+                    builder.append(record.getSourceClassName()).append(".");
+                    builder.append(record.getSourceMethodName()).append(")");
+                    builder.append(System.lineSeparator());
+                    return builder.toString();
+                }
+            }
+            );
+            logger.addHandler(fileHadler);
+            logger.setLevel(Level.ALL);
+        }
+    }
+    
+        /**
      * Creates new form Login
      */
+    
     public Login() {
         initComponents();
         getContentPane().setBackground(Color.gray);
     }
 
-    public Boolean selectLogin(String id, String senha) {
+    public Boolean selectLogin(String id, String senha) throws IOException {
         try {
             Map<String, Object> registro = con.queryForMap(
                     "select * from maquina where idMaquina = ? and senha = ?", id, senha);
             System.out.println("Login realizado com sucesso.");
+            logGeral.genereteLoginSucesso();
+            logGeral.genereteInfos();
             return true;
         } catch (EmptyResultDataAccessException e) {
             return false;
@@ -160,27 +238,32 @@ public class Login extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String id = jTextField1.getText();
         String senha = jPasswordField1.getText();
-//        String senha = jTextField2.getText();
-        if (selectLogin(id, senha)) {
-            nextScreen();
-            captura.mostrarInfoSistema();
-            comp.inserirComponente();
-            if (comp.consultarConfig(id) < 3) {
-                comp.inserirConfiguracao(id);
-            }
-            new Timer().scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    Date dataHoraAtual = new Date();
-                    String data = new SimpleDateFormat("dd/MM/yyyy").format(dataHoraAtual);
-                    String hora = new SimpleDateFormat("HH:mm:ss").format(dataHoraAtual);
-                    captura.inserirNoBanco(id, senha, data, hora);
-                    captura.inserirNoBancoMySQL(id, senha, data, hora);
+        try {
+            //        String senha = jTextField2.getText();
+            if (selectLogin(id, senha)) {
+                nextScreen();
+                captura.mostrarInfoSistema();
+                comp.inserirComponente();
+                if (comp.consultarConfig(id) < 3) {
+                    comp.inserirConfiguracao(id);
                 }
-            }, 0, 10000);
-
-        } else {
-            lblErro.setText("Credenciais incorretas.");
+                new Timer().scheduleAtFixedRate(new TimerTask() {
+                    @Override
+                    public void run() {
+                        Date dataHoraAtual = new Date();
+                        String data = new SimpleDateFormat("dd/MM/yyyy").format(dataHoraAtual);
+                        String hora = new SimpleDateFormat("HH:mm:ss").format(dataHoraAtual);
+                        captura.inserirNoBanco(id, senha, data, hora);
+                        captura.inserirNoBancoMySQL(id, senha, data, hora);
+                    }
+                }, 0, 10000);
+                
+            } else {
+                lblErro.setText("Credenciais incorretas.");
+                logGeral.genereteErroLogin();
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -191,7 +274,11 @@ public class Login extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String args[]) throws IOException {
+        logFormatacao();
+        Captura.logFormatacao();
+        Componente.logFormatacao();
+        Alerta.logFormatacao();
 
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">

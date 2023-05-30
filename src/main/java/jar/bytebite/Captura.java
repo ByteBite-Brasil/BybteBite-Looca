@@ -6,6 +6,17 @@ import com.github.britooo.looca.api.group.memoria.Memoria;
 import com.github.britooo.looca.api.group.processador.Processador;
 import com.github.britooo.looca.api.group.sistema.Sistema;
 import com.github.britooo.looca.api.group.temperatura.Temperatura;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.logging.FileHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
@@ -69,6 +80,68 @@ public class Captura extends Conexao {
     Double armazenamentoEmUsoSemFormatar = Double.valueOf(discoGrupo.getDiscos().get(0).getBytesDeLeitura());
     Double armazenamentoEmUsoSemFormatado = armazenamentoEmUsoSemFormatar / 1000000000.00;
     Double armazenamentoEmUso = Math.round(armazenamentoEmUsoSemFormatado * scale) / scale;
+
+    private static Logger logger = Logger.getLogger(Captura.class.getName());
+
+    public static void logFormatacao() throws IOException {
+        Looca looca = new Looca();
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        String dataFormatada = dateFormat.format(date);
+        String sistemaOperacional = looca.getSistema().getSistemaOperacional();
+
+        if (sistemaOperacional.equalsIgnoreCase("Windows")) {
+            Path path = Paths.get("C:/Logs-ByteBite/Capturas/");
+            if (!Files.exists(path)) {
+                Files.createDirectories(path);
+            }
+            FileHandler fileHadler = new FileHandler(String.format("C:/Logs-ByteBite/Capturas/%s.txt", dataFormatada));
+            fileHadler.setFormatter(new Formatter() {
+                private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy >> HH:mm:ss");
+
+                public String format(LogRecord record) {
+
+                    StringBuilder builder = new StringBuilder();
+                    builder.append(dateFormat.format(new Date())).append(" ");
+                    builder.append(record.getLevel()).append(": ");
+                    builder.append(record.getMessage()).append(" (");
+                    builder.append(record.getSourceClassName()).append(".");
+                    builder.append(record.getSourceMethodName()).append(")");
+                    builder.append(System.lineSeparator());
+                    return builder.toString();
+                }
+            }
+            );
+            logger.addHandler(fileHadler);
+            logger.setLevel(Level.ALL);
+        }
+
+        if (sistemaOperacional.equalsIgnoreCase("Ubuntu")) {
+            Path path = Paths.get("/home/ubuntu/Desktop/Logs-ByteBite/Capturas/");
+            if (!Files.exists(path)) {
+                Files.createDirectories(path);
+            }
+            FileHandler fileHadler = new FileHandler(String.format("/home/ubuntu/Desktop/Logs-ByteBite/Capturas/%s.txt", dataFormatada));
+            fileHadler.setFormatter(new Formatter() {
+                private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy >> HH:nn:ss");
+
+                public String format(LogRecord record) {
+
+                    StringBuilder builder = new StringBuilder();
+                    builder.append(dateFormat.format(new Date())).append(" ");
+                    builder.append(record.getLevel()).append(": ");
+                    builder.append(record.getMessage()).append(" (");
+                    builder.append(record.getSourceClassName()).append(".");
+                    builder.append(record.getSourceMethodName()).append(")");
+                    builder.append(System.lineSeparator());
+                    return builder.toString();
+                }
+            }
+            );
+            logger.addHandler(fileHadler);
+            logger.setLevel(Level.ALL);
+        }
+    }
 
     public Integer retornarFkConfigCpu(String id, String senha) {
         return con.queryForObject("select idConfiguracao from configuracao as c join maquina as m on c.fk_maquina = m.idMaquina join componente as comp on c.fk_componente = comp.idComponente where m.idMaquina = ? and m.senha = ? and comp.total = ?; ", Integer.class, id, senha, totalCpu);
@@ -173,19 +246,23 @@ public class Captura extends Conexao {
                     data, hora, temperaturaCpu, retornarFkConfigCpu(id, senha), 2);
 
             System.out.println("Inseriu no banco MySQL os dados da CPU");
+            logger.info("Os dados da CPU foram inseridos no banco MySQL");
 
             conMySQL.update("insert into log_captura ( data_, hora, medicao, fk_configuracao, fk_tipo_log) values(?, ?, ?, ?, ?);",
                     data, hora, ramEmUso, retornarFkConfigRam(id, senha), 1);
 
             System.out.println("Inseriu no banco MySQL os dados da mamória ram");
+            logger.info("Os dados da mamória RAM foram inseridos no banco MySQL");
 
             conMySQL.update("insert into log_captura ( data_, hora, medicao, fk_configuracao, fk_tipo_log) values(?, ?, ?, ?, ?);",
                     data, hora, armazenamentoEmUso, retornarFkConfigArmazenamento(id, senha), 1);
 
             System.out.println("Inseriu no banco MySQL os dados do armazenamento");
+            logger.info("Os dados do armazenamento foram inseridos no banco MySQL");
 
         } catch (Exception e) {
             System.out.println("Erro ao inserir dados no banco MySQL.");
+            logger.severe("Houve uma falha durante a inserção dos dados em relação ao MySQL.");
             System.out.println(e);
         }
     }

@@ -39,86 +39,152 @@ public class LogGeral {
     public Integer janelas = looca.getGrupoDeJanelas().getTotalJanelas();
     public Temperatura temperatura = captura.temperatura;
     public String sistemaOperacional = looca.getSistema().getSistemaOperacional();
-    Path path = Paths.get("C:/Logs-ByteBite/");
+
+    Path pathWin = Paths.get("C:/Logs-ByteBite/");
+    Path pathLinux = Paths.get("/home/ubuntu/Desktop/");
 
     public void genereteInfos() throws IOException {
+        if (sistemaOperacional.equalsIgnoreCase("Ubuntu")) {
+            String mensagem = "\n\n_____________________Informações fixas_____________________\n"
+                    + "\nSistema Opéracional                       >> " + sistemaOperacional
+                    + "\nFabricante                                >> " + fabricante
+                    + "\nArquitetura                               >> " + arquitetura
+                    + "\n\n______________Informações do sistema de captura_____________"
+                    + "\nRAM TOTAL                                 >>" + ramTotal + " GB"
+                    + "\nRAM DISPONÍVEL                            >>" + ramDisponivel + " GB"
+                    + "\nCPU TOTAL                                 >>" + totalCpu + " GHz"
+                    + "\nCPU EM USO                                >>" + porcUsoCpu + " GHz"
+                    //                + "\nTEMPERATURA DA CPU                        >>" + temperatura + " C°" >> captura retorna 0.0
+                    + "\nARMAZENAMENTO TOTAL                       >>" + armazenamentoTotal + "GB"
+                    + "\nARMAZENAMENTO EM USO                      >>" + armazenamentoUso + " GB"
+                    + "\nJANELAS ABERTAS                           >> " + janelas + " U";
 
-        String mensagem = "\n\n_____________________Informações fixas_____________________\n"
-                + "\nSistema Opéracional                       >> " + sistemaOperacional
-                + "\nFabricante                                >> " + fabricante
-                + "\nArquitetura                               >> " + arquitetura
-                + "\n\n______________Informações do sistema de captura_____________"
-                + "\nRAM TOTAL                                 >>" + ramTotal + " GB"
-                + "\nRAM DISPONÍVEL                            >>" + ramDisponivel + " GB"
-                + "\nCPU TOTAL                                 >>" + totalCpu + " GHz"
-                + "\nCPU EM USO                                >>" + porcUsoCpu + " GHz"
-                //                + "\nTEMPERATURA DA CPU                        >>" + temperatura + " C°" >> captura retorna 0.0
-                + "\nARMAZENAMENTO TOTAL                       >>" + armazenamentoTotal + "GB"
-                + "\nARMAZENAMENTO EM USO                      >>" + armazenamentoUso + " GB"
-                + "\nJANELAS ABERTAS                           >> " + janelas + " U";
-
-        if (!Files.exists(path)) {
-            Files.createDirectory(path);
+            if (!Files.exists(pathLinux)) {
+                Files.createDirectory(pathLinux);
+            }
+            File log = new File("/home/ubuntu/Desktop/Histórico de acesso.txt");
+            if (!log.exists()) {
+                log.createNewFile();
+            }
+            FileWriter fw = new FileWriter(log, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(mensagem);
+            bw.newLine();
+            bw.close();
+            fw.close();
         }
 
-        File log = new File("C:/Logs-ByteBite/Histórico de acesso.txt");
+        if (sistemaOperacional.equalsIgnoreCase("Windows")) {
+            String mensagem = "\n\n_____________________Informações fixas_____________________\n"
+                    + "\nSistema Opéracional                       >> " + sistemaOperacional
+                    + "\nFabricante                                >> " + fabricante
+                    + "\nArquitetura                               >> " + arquitetura
+                    + "\n\n______________Informações do sistema de captura_____________"
+                    + "\nRAM TOTAL                                 >>" + ramTotal + " GB"
+                    + "\nRAM DISPONÍVEL                            >>" + ramDisponivel + " GB"
+                    + "\nCPU TOTAL                                 >>" + totalCpu + " GHz"
+                    + "\nCPU EM USO                                >>" + porcUsoCpu + " GHz"
+                    //                + "\nTEMPERATURA DA CPU                        >>" + temperatura + " C°" >> captura retorna 0.0
+                    + "\nARMAZENAMENTO TOTAL                       >>" + armazenamentoTotal + "GB"
+                    + "\nARMAZENAMENTO EM USO                      >>" + armazenamentoUso + " GB"
+                    + "\nJANELAS ABERTAS                           >> " + janelas + " U";
 
-        if (!log.exists()) {
-            log.createNewFile();
+            if (!Files.exists(pathWin)) {
+                Files.createDirectory(pathWin);
+            }
+            File log = new File("C:/Logs-ByteBite/Histórico de acesso.txt");
+            if (!log.exists()) {
+                log.createNewFile();
+            }
+            FileWriter fw = new FileWriter(log, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(mensagem);
+            bw.newLine();
+            bw.close();
+            fw.close();
         }
-
-        FileWriter fw = new FileWriter(log, true);
-        BufferedWriter bw = new BufferedWriter(fw);
-        bw.write(mensagem);
-        bw.newLine();
-        bw.close();
-        fw.close();
     }
 
     public void genereteErroLogin() throws IOException {
-
-        String mensagem = "--------------------------------------------------------------\n"
-                + "Data da captura :" + dataAtual
-                + "\nFalha >> Login preenchido incorretamente";
-
-//        Path path = Paths.get("C:/Logs-ByteBite/");
-        if (!Files.exists(path)) {
-            Files.createDirectory(path);
+        if (sistemaOperacional.equalsIgnoreCase("Ubuntu")) {
+            String mensagem = "--------------------------------------------------------------\n"
+                    + "Data da captura :" + dataAtual
+                    + "\nFalha >> Login preenchido incorretamente";
+            if (!Files.exists(pathLinux)) {
+                Files.createDirectory(pathLinux);
+            }
+            File log = new File("/home/ubuntu/Desktop/Histórico de acesso.txt");
+            if (!log.exists()) {
+                log.createNewFile();
+            }
+            FileWriter fw = new FileWriter(log, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(mensagem);
+            bw.newLine();
+            bw.close();
+            fw.close();
         }
-        File log = new File("C:/Logs-ByteBite/Histórico de acesso.txt");
-        if (!log.exists()) {
-            log.createNewFile();
+        if (sistemaOperacional.equalsIgnoreCase("Windows")) {
+            String mensagem = "--------------------------------------------------------------\n"
+                    + "Data da captura :" + dataAtual
+                    + "\nFalha >> Login preenchido incorretamente";
+            if (!Files.exists(pathWin)) {
+                Files.createDirectory(pathWin);
+            }
+            File log = new File("C:/Logs-ByteBite/Histórico de acesso.txt");
+            if (!log.exists()) {
+                log.createNewFile();
+            }
+            FileWriter fw = new FileWriter(log, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(mensagem);
+            bw.newLine();
+            bw.close();
+            fw.close();
         }
-
-        FileWriter fw = new FileWriter(log, true);
-        BufferedWriter bw = new BufferedWriter(fw);
-        bw.write(mensagem);
-        bw.newLine();
-        bw.close();
-        fw.close();
     }
 
     public void genereteLoginSucesso() throws IOException {
-
-        String mensagem = "--------------------------------------------------------------\n"
-                + "Data da captura :" + dataAtual
-                + "\nSucesso >> Login realizado com sucesso!";
+        if (sistemaOperacional.equalsIgnoreCase("Ubuntu")) {
+            String mensagem = "--------------------------------------------------------------\n"
+                    + "Data da captura :" + dataAtual
+                    + "\nSucesso >> Login realizado com sucesso!";
 
 //        Path path = Paths.get("C:/Logs-ByteBite/");
-        if (!Files.exists(path)) {
-            Files.createDirectory(path);
-        }
-        File log = new File("C:/Logs-ByteBite/Histórico de acesso.txt");
-        if (!log.exists()) {
-            log.createNewFile();
-        }
+            if (!Files.exists(pathLinux)) {
+                Files.createDirectory(pathLinux);
+            }
+            File log = new File("/home/ubuntu/Desktop/Histórico de acesso.txt");
+            if (!log.exists()) {
+                log.createNewFile();
+            }
 
-        FileWriter fw = new FileWriter(log, true);
-        BufferedWriter bw = new BufferedWriter(fw);
-        bw.write(mensagem);
-        bw.newLine();
-        bw.close();
-        fw.close();
+            FileWriter fw = new FileWriter(log, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(mensagem);
+            bw.newLine();
+            bw.close();
+            fw.close();
+        }
+        if (sistemaOperacional.equalsIgnoreCase("Windows")) {
+            String mensagem = "--------------------------------------------------------------\n"
+                    + "Data da captura :" + dataAtual
+                    + "\nSucesso >> Login realizado com sucesso!";
+            if (!Files.exists(pathWin)) {
+                Files.createDirectory(pathWin);
+            }
+            File log = new File("C:/Logs-ByteBite/Histórico de acesso.txt");
+            if (!log.exists()) {
+                log.createNewFile();
+            }
+
+            FileWriter fw = new FileWriter(log, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(mensagem);
+            bw.newLine();
+            bw.close();
+            fw.close();
+        }
     }
 
     private Date Date() {
