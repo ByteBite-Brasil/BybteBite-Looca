@@ -1,7 +1,6 @@
 package jar.bytebite;
 
 import org.springframework.jdbc.core.JdbcTemplate;
-import twilio.bytebite.TwilioSms;
 
 /**
  *
@@ -9,7 +8,6 @@ import twilio.bytebite.TwilioSms;
  */
 public class Alerta extends Conexao {
 
-    TwilioSms twilio = new TwilioSms();
     Conexao conexao = new Conexao();
     JdbcTemplate con = conexao.getConnection();
     //Criticiade id 1= moderado 2= crítico
@@ -34,7 +32,6 @@ public class Alerta extends Conexao {
         } catch (Exception e) {
             System.out.println("Erro ao inserir alertas.");
         }
-//            twilio.enviaSms("Alerta critico na máquina xxx");
     }
 
 }
