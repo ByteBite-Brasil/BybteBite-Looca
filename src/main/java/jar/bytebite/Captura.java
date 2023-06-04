@@ -95,7 +95,7 @@ public class Captura extends Conexao {
             if (!Files.exists(path)) {
                 Files.createDirectories(path);
             }
-            FileHandler fileHadler = new FileHandler(String.format("C:/Logs-ByteBite/Capturas/%s.txt", dataFormatada));
+            FileHandler fileHadler = new FileHandler(String.format("C:/Logs-ByteBite/Capturas/%s.txt", dataFormatada),true);
             fileHadler.setFormatter(new Formatter() {
                 private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy >> HH:mm:ss");
 
@@ -121,9 +121,9 @@ public class Captura extends Conexao {
             if (!Files.exists(path)) {
                 Files.createDirectories(path);
             }
-            FileHandler fileHadler = new FileHandler(String.format("/home/ubuntu/Desktop/Logs-ByteBite/Capturas/%s.txt", dataFormatada));
+            FileHandler fileHadler = new FileHandler(String.format("/home/ubuntu/Desktop/Logs-ByteBite/Capturas/%s.txt", dataFormatada),true);
             fileHadler.setFormatter(new Formatter() {
-                private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy >> HH:nn:ss");
+                private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy >> HH:mm:ss");
 
                 public String format(LogRecord record) {
 

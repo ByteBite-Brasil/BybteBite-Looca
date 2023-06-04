@@ -55,10 +55,9 @@ public class Login extends javax.swing.JFrame {
             if (!Files.exists(path)) {
                 Files.createDirectories(path);
             }
-            FileHandler fileHadler = new FileHandler(String.format("C:/Logs-ByteBite/Login/%s.txt", dataFormatada));
+            FileHandler fileHadler = new FileHandler(String.format("C:/Logs-ByteBite/Login/%s.txt", dataFormatada),true);
             fileHadler.setFormatter(new Formatter() {
                 private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy >> HH:mm:ss");
-
                 public String format(LogRecord record) {
 
                     StringBuilder builder = new StringBuilder();
@@ -81,9 +80,9 @@ public class Login extends javax.swing.JFrame {
             if (!Files.exists(path)) {
                 Files.createDirectories(path);
             }
-            FileHandler fileHadler = new FileHandler(String.format("/home/ubuntu/Desktop/Logs-ByteBite/Login/%s.txt", dataFormatada));
+            FileHandler fileHadler = new FileHandler(String.format("/home/ubuntu/Desktop/Logs-ByteBite/Login/%s.txt", dataFormatada),true);
             fileHadler.setFormatter(new Formatter() {
-                private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy >> HH:nn:ss");
+                private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy >> HH:mm:ss");
 
                 public String format(LogRecord record) {
 
@@ -119,6 +118,7 @@ public class Login extends javax.swing.JFrame {
             System.out.println("Login realizado com sucesso.");
             logGeral.genereteLoginSucesso();
             logGeral.genereteInfos();
+            logger.info("Login realizado com sucesso.");
             return true;
         } catch (EmptyResultDataAccessException e) {
             return false;
@@ -261,6 +261,7 @@ public class Login extends javax.swing.JFrame {
             } else {
                 lblErro.setText("Credenciais incorretas.");
                 logGeral.genereteErroLogin();
+                logger.severe("Credenciais incorretas.");
             }
         } catch (IOException ex) {
             Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);

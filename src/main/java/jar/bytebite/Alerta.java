@@ -27,7 +27,7 @@ public class Alerta extends Conexao {
     JdbcTemplate con = conexao.getConnection();
     //Criticiade id 1= moderado 2= crítico
 
-    private static Logger logger = Logger.getLogger(Login.class.getName());
+    private static Logger logger = Logger.getLogger(Alerta.class.getName());
 
     public static void logFormatacao() throws IOException {
         Looca looca = new Looca();
@@ -41,7 +41,7 @@ public class Alerta extends Conexao {
             if (!Files.exists(path)) {
                 Files.createDirectories(path);
             }
-            FileHandler fileHadler = new FileHandler(String.format("C:/Logs-ByteBite/Alertas/%s.txt", dataFormatada));
+            FileHandler fileHadler = new FileHandler(String.format("C:/Logs-ByteBite/Alertas/%s.txt", dataFormatada),true);
             fileHadler.setFormatter(new Formatter() {
                 private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy >> HH:mm:ss");
 
@@ -67,9 +67,9 @@ public class Alerta extends Conexao {
             if (!Files.exists(path)) {
                 Files.createDirectories(path);
             }
-            FileHandler fileHadler = new FileHandler(String.format("/home/ubuntu/Desktop/Logs-ByteBite/Alertas/%s.txt", dataFormatada));
+            FileHandler fileHadler = new FileHandler(String.format("/home/ubuntu/Desktop/Logs-ByteBite/Alertas/%s.txt", dataFormatada),true);
             fileHadler.setFormatter(new Formatter() {
-                private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy >> HH:nn:ss");
+                private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy >> HH:mm:ss");
 
                 public String format(LogRecord record) {
 
