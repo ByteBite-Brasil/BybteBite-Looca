@@ -80,7 +80,7 @@ public class Login extends javax.swing.JFrame {
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/LogoRed.png"))); // NOI18N
         jLabel1.setText("jLabel1");
 
-        jLabel2.setText("Email: ");
+        jLabel2.setText("Id:");
 
         jLabel3.setText("Senha: ");
 
