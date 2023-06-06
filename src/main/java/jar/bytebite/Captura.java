@@ -17,7 +17,10 @@ import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import org.json.JSONObject;
 import org.springframework.jdbc.core.JdbcTemplate;
+import slack.bytebite.Slack;
+import twilio.bytebite.TwilioSms;
 
 /**
  *
@@ -33,6 +36,10 @@ public class Captura extends Conexao {
 
     Alerta alerta = new Alerta();
 
+    JSONObject json = new JSONObject();
+    
+    TwilioSms sms = new TwilioSms();
+
     Looca looca = new Looca();
     Sistema sistema = looca.getSistema();
     Memoria memoria = looca.getMemoria();
@@ -42,13 +49,16 @@ public class Captura extends Conexao {
     double scale = Math.pow(10, 2);
 
     //        Processador
-    Double porcUso = cpu.getUso();
-    double porcUsoCpu = Math.round(porcUso * scale) / scale;
+    
 
     Long LongCpu = looca.getProcessador().getFrequencia();
     double c = LongCpu.doubleValue();
     Double cpuBites = c / 1000000000;
     double totalCpu = Math.round(cpuBites * scale) / scale;
+    
+    Double porcUso = cpu.getUso();
+    double porcUsoFormat = Math.round(porcUso * scale) / scale;
+    Double porcUsoCpu = porcUsoFormat / 100 * totalCpu ;
 
     Double temperaturaAntes = (Math.random() * 35) + 45;
     double temperaturaCpu = Math.round(temperaturaAntes * scale) / scale;
@@ -69,7 +79,7 @@ public class Captura extends Conexao {
     Double ramTotal = Math.round(ramTotalSemFormatado * scale) / scale;
 
 //        Janelas
-    Integer janelasTotal = looca.getGrupoDeJanelas().getTotalJanelas();
+    Integer janelasTotal = looca.getGrupoDeJanelas().getTotalJanelasVisiveis();
 
 //        Armazenamento
     Long longArmazenamento = discoGrupo.getTamanhoTotal();
@@ -158,6 +168,10 @@ public class Captura extends Conexao {
     public Integer retornarIdLog(Double medicao, String data, String hora) {
         return con.queryForObject("select idLog from log_captura where data_ = ? and hora = ? and medicao = ?;", Integer.class, data, hora, medicao);
     }
+    
+    public String retornarNomeMaquina(Double medicao, String data, String hora) {
+        return con.queryForObject("select nome from maquina as m join configuracao as c on  c.fk_maquina = m.idMaquina join log_captura as l on l.fk_configuracao = c.idConfiguracao where l.data_ = ? and l.hora = ? and l.medicao = ?;", String.class, data, hora, medicao);
+    }
 
     public void inserirNoBanco(String id, String senha, String data, String hora) {
         try {
@@ -184,10 +198,10 @@ public class Captura extends Conexao {
                     data, hora, armazenamentoEmUso, retornarFkConfigArmazenamento(id, senha), 1);
 
             System.out.println("Inseriu no banco os dados do armazenamento");
-            System.out.println(porcUsoCpu);
-            System.out.println(temperaturaCpu);
-            System.out.println(ramEmUso);
-            System.out.println(armazenamentoEmUso);
+//            System.out.println(porcUsoCpu);
+//            System.out.println(temperaturaCpu);
+//            System.out.println(ramEmUso);
+//            System.out.println(armazenamentoEmUso);
             verificarAlertas(data, hora);
 
         } catch (Exception e) {
@@ -196,7 +210,7 @@ public class Captura extends Conexao {
         }
     }
 
-    public void verificarAlertas(String data, String hora) {
+    public void verificarAlertas(String data, String hora) throws IOException, InterruptedException {
 //        1 Uso da CPU está alto.
 //        2 uso da CPU está em estado crítico.
 //        3 A temperatura da CPU está alta.
@@ -209,29 +223,54 @@ public class Captura extends Conexao {
         //Moderado
         if ((porcUsoCpu * 100 / totalCpu) >= 70 && (porcUsoCpu * 100 / totalCpu) < 90) {
             alerta.alertaModerado(retornarIdLog(porcUsoCpu, data, hora), 1, data, hora);
+            json.put("text", "O Uso de CPU da máquina '" + retornarNomeMaquina(porcUsoCpu, data, hora) +  "' está alto, chegou em " + porcUsoCpu + "GHz. :warning:");
+            Slack.enviarMensagem(json);
+            sms.enviaSms("O Uso de CPU da máquina '" + retornarNomeMaquina(porcUsoCpu, data, hora) +  "' está alto, chegou em " + porcUsoCpu + "GHz.");
         }
         if (temperaturaCpu >= 65 && temperaturaCpu < 71) {
             alerta.alertaModerado(retornarIdLog(temperaturaCpu, data, hora), 3, data, hora);
+            json.put("text", "A temperatura de CPU da máquina '"+ retornarNomeMaquina(temperaturaCpu, data, hora) +"' está alta, chegou em " + temperaturaCpu + "°C. :warning:");
+            Slack.enviarMensagem(json);
+            sms.enviaSms("A temperatura de CPU da máquina '"+ retornarNomeMaquina(temperaturaCpu, data, hora) +"' está alta, chegou em " + temperaturaCpu + "°C.");
         }
         if ((ramEmUso * 100 / ramTotal) >= 80 && (ramEmUso * 100 / ramTotal) < 90) {
             alerta.alertaModerado(retornarIdLog(ramEmUso, data, hora), 5, data, hora);
+            json.put("text", "O uso de memória ram da máquina '"+ retornarNomeMaquina(ramEmUso, data, hora) +"' está alto, chegou em " + ramEmUso + "GB. :warning:");
+            Slack.enviarMensagem(json);
+            sms.enviaSms("O uso de memória ram da máquina '"+ retornarNomeMaquina(ramEmUso, data, hora) +"' está alto, chegou em " + ramEmUso + "GB.");
         }
         if ((armazenamentoEmUso * 100 / armazenamentoTotal) >= 70 && (armazenamentoEmUso * 100 / armazenamentoTotal) < 90) {
             alerta.alertaModerado(retornarIdLog(armazenamentoEmUso, data, hora), 7, data, hora);
+            json.put("text", "O uso de armazenamento da máquina '"+ retornarNomeMaquina(armazenamentoEmUso, data, hora) +"' está alto, chegou em " + armazenamentoEmUso + "GB. :warning:");
+            Slack.enviarMensagem(json);
+            sms.enviaSms("O uso de armazenamento da máquina '"+ retornarNomeMaquina(armazenamentoEmUso, data, hora) +"' está alto, chegou em " + armazenamentoEmUso + "GB.");
         }
         //Crítico
 
         if ((porcUsoCpu * 100 / totalCpu) >= 90) {
             alerta.alertaCritico(retornarIdLog(porcUsoCpu, data, hora), 2, data, hora);
+            json.put("text", "O Uso de CPU da máquina ' "+ retornarNomeMaquina(porcUsoCpu, data, hora) +"' está em estado crítico e chegou na marca de " + porcUsoCpu + "GHz. :rotating_light:");
+            Slack.enviarMensagem(json);
+            sms.enviaSms("O Uso de CPU da máquina ' "+ retornarNomeMaquina(porcUsoCpu, data, hora) +"' está em estado crítico e chegou na marca de " + porcUsoCpu + "GHz.");
         }
         if (temperaturaCpu >= 71) {
             alerta.alertaCritico(retornarIdLog(temperaturaCpu, data, hora), 4, data, hora);
+            json.put("text", "A temperatura de CPU da máquina '"+ retornarNomeMaquina(temperaturaCpu, data, hora) +"' está em estado crítico e atingiu a marca de " + temperaturaCpu + "°C. :rotating_light:");
+            Slack.enviarMensagem(json);
+            sms.enviaSms("A temperatura de CPU da máquina '"+ retornarNomeMaquina(temperaturaCpu, data, hora) +"' está em estado crítico e atingiu a marca de " + temperaturaCpu + "°C.");
         }
         if ((ramEmUso * 100 / ramTotal) >= 90) {
             alerta.alertaCritico(retornarIdLog(ramEmUso, data, hora), 6, data, hora);
+            json.put("text", "O uso de memória ram da máquina '"+ retornarNomeMaquina(ramEmUso, data, hora) +"' está em estado crítico, atingindo " + ramEmUso + "GB. :rotating_light:");
+            Slack.enviarMensagem(json);
+            sms.enviaSms("O uso de memória ram da máquina '"+ retornarNomeMaquina(ramEmUso, data, hora) +"' está em estado crítico, atingindo " + ramEmUso + "GB.");
         }
         if ((armazenamentoEmUso * 100 / armazenamentoTotal) >= 99) {
             alerta.alertaCritico(retornarIdLog(armazenamentoEmUso, data, hora), 8, data, hora);
+            json.put("text", "O uso de armazenamento da máquina '"+ retornarNomeMaquina(armazenamentoEmUso, data, hora) +"' está em estado crítico e chegou a " + armazenamentoEmUso + "GB. :rotating_light:");
+            Slack.enviarMensagem(json);
+            sms.enviaSms("O uso de armazenamento da máquina '"+ retornarNomeMaquina(armazenamentoEmUso, data, hora) +"' está em estado crítico e chegou a " + armazenamentoEmUso + "GB.");
+            
         }
 
     }

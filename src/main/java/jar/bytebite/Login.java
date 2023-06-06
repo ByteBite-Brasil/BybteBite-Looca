@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -17,7 +16,6 @@ import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.dao.EmptyResultDataAccessException;
 
@@ -39,8 +37,6 @@ public class Login extends javax.swing.JFrame {
     Componente comp = new Componente();
     LogGeral logGeral = new LogGeral();
 
-
-    
     private static Logger logger = Logger.getLogger(Login.class.getName());
 
     public static void logFormatacao() throws IOException {
@@ -55,9 +51,10 @@ public class Login extends javax.swing.JFrame {
             if (!Files.exists(path)) {
                 Files.createDirectories(path);
             }
-            FileHandler fileHadler = new FileHandler(String.format("C:/Logs-ByteBite/Login/%s.txt", dataFormatada),true);
+            FileHandler fileHadler = new FileHandler(String.format("C:/Logs-ByteBite/Login/%s.txt", dataFormatada));
             fileHadler.setFormatter(new Formatter() {
                 private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy >> HH:mm:ss");
+
                 public String format(LogRecord record) {
 
                     StringBuilder builder = new StringBuilder();
@@ -80,7 +77,7 @@ public class Login extends javax.swing.JFrame {
             if (!Files.exists(path)) {
                 Files.createDirectories(path);
             }
-            FileHandler fileHadler = new FileHandler(String.format("/home/ubuntu/Desktop/Logs-ByteBite/Login/%s.txt", dataFormatada),true);
+            FileHandler fileHadler = new FileHandler(String.format("/home/ubuntu/Desktop/Logs-ByteBite/Login/%s.txt", dataFormatada));
             fileHadler.setFormatter(new Formatter() {
                 private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy >> HH:mm:ss");
 
@@ -101,11 +98,10 @@ public class Login extends javax.swing.JFrame {
             logger.setLevel(Level.ALL);
         }
     }
-    
-        /**
+
+    /**
      * Creates new form Login
      */
-    
     public Login() {
         initComponents();
         getContentPane().setBackground(Color.gray);
@@ -239,7 +235,7 @@ public class Login extends javax.swing.JFrame {
         String id = jTextField1.getText();
         String senha = jPasswordField1.getText();
         try {
-            //        String senha = jTextField2.getText();
+//        String senha = jTextField2.getText();
             if (selectLogin(id, senha)) {
                 nextScreen();
                 captura.mostrarInfoSistema();
@@ -250,14 +246,15 @@ public class Login extends javax.swing.JFrame {
                 new Timer().scheduleAtFixedRate(new TimerTask() {
                     @Override
                     public void run() {
+                        Captura captura1 = new Captura();
                         Date dataHoraAtual = new Date();
                         String data = new SimpleDateFormat("dd/MM/yyyy").format(dataHoraAtual);
                         String hora = new SimpleDateFormat("HH:mm:ss").format(dataHoraAtual);
-                        captura.inserirNoBanco(id, senha, data, hora);
-                        captura.inserirNoBancoMySQL(id, senha, data, hora);
+                        captura1.inserirNoBanco(id, senha, data, hora);
+                        captura1.inserirNoBancoMySQL(id, senha, data, hora);
                     }
                 }, 0, 10000);
-                
+
             } else {
                 lblErro.setText("Credenciais incorretas.");
                 logGeral.genereteErroLogin();

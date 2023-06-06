@@ -1,7 +1,6 @@
 package jar.bytebite;
 
 import com.github.britooo.looca.api.core.Looca;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,8 +12,8 @@ import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import org.springframework.jdbc.core.JdbcTemplate;
-import twilio.bytebite.TwilioSms;
 import java.util.logging.Logger;
+
 
 /**
  *
@@ -22,7 +21,6 @@ import java.util.logging.Logger;
  */
 public class Alerta extends Conexao {
 
-    TwilioSms twilio = new TwilioSms();
     Conexao conexao = new Conexao();
     JdbcTemplate con = conexao.getConnection();
     //Criticiade id 1= moderado 2= crítico
@@ -115,7 +113,6 @@ public class Alerta extends Conexao {
             System.out.println("Erro ao inserir alertas.");
             logger.severe("Houve erro ao inserir os alertas críticos.");
         }
-//            twilio.enviaSms("Alerta critico na máquina xxx");
     }
 
 }
